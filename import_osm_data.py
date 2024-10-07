@@ -8,3 +8,6 @@ nodes, edges = ox.graph_to_gdfs(graph)
 
 # %%
 print(edges.head())
+
+# %%
+print(nodes.head())
