@@ -50,5 +50,11 @@ edges['tunnel']
 edges['tunnel'] 
 
 # %%
-# How to find duplicate geometries?
-edges[edges.duplicated(subset="geometry", keep=False)] # returns zero...
+# Removing duplicate geometries (inverted ones)
+edges = edges.reset_index()
+
+edges["node_pair"] = edges.apply(lambda row: tuple(sorted([row.u, row.v])), axis=1)
+
+duplicate_edges = edges[edges.duplicated(subset="node_pair", keep=False)]
+
+unique_edges = edges.drop_duplicates(subset="node_pair", keep="first")
