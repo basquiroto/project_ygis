@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<StyledLayerDescriptor version="1.0.0"
+    xmlns="http://www.opengis.net/sld"
+    xmlns:ogc="http://www.opengis.net/ogc"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.opengis.net/sld
+        http://schemas.opengis.net/sld/1.0.0/StyledLayerDescriptor.xsd">
+
+    <NamedLayer>
+        <Name>ruas</Name>
+        <UserStyle>
+            <Title>Tipos</Title>
+            <Abstract>Classificação das ruas conforme seu nível hierárquico.</Abstract>
+            <FeatureTypeStyle>
+                <Rule>
+                    <Title>Residencial</Title>
+                    <ogc:Filter>
+                        <ogc:PropertyIsEqualTo>
+                            <ogc:PropertyName>tipo_via</ogc:PropertyName>
+                            <ogc:Literal>residential</ogc:Literal>
+                        </ogc:PropertyIsEqualTo>
+                    </ogc:Filter>
+                    <LineSymbolizer>
+                        <Stroke>
+                            <CssParameter name="stroke">#F5DEB3</CssParameter>
+                            <CssParameter name="stroke-width">1</CssParameter> 
+                        </Stroke>
+                    </LineSymbolizer>
+                </Rule>
+                <Rule>
+                    <Title>Ruas Locais</Title>
+                    <ogc:Filter>
+                        <ogc:PropertyIsEqualTo>
+                            <ogc:PropertyName>tipo_via</ogc:PropertyName>
+                            <ogc:Literal>tertiary</ogc:Literal>
+                        </ogc:PropertyIsEqualTo>
+                    </ogc:Filter>
+                    <LineSymbolizer>
+                        <Stroke>
+                            <CssParameter name="stroke">#FFA07A</CssParameter>
+                            <CssParameter name="stroke-width">2</CssParameter>
+                        </Stroke>
+                    </LineSymbolizer>
+                </Rule>
+                <Rule>
+                    <Title>Ruas Principais</Title>
+                    <ogc:Filter>
+                        <ogc:PropertyIsEqualTo>
+                            <ogc:PropertyName>tipo_via</ogc:PropertyName>
+                            <ogc:Literal>primary</ogc:Literal>
+                        </ogc:PropertyIsEqualTo>
+                    </ogc:Filter>
+                    <LineSymbolizer>
+                        <Stroke>
+                            <CssParameter name="stroke">#FF4500</CssParameter>
+                            <CssParameter name="stroke-width">3.5</CssParameter>
+                        </Stroke>
+                    </LineSymbolizer>
+                </Rule>
+                <Rule>
+                    <Title>Ruas Secundárias</Title>
+                    <ogc:Filter>
+                        <ogc:PropertyIsEqualTo>
+                            <ogc:PropertyName>tipo_via</ogc:PropertyName>
+                            <ogc:Literal>secondary</ogc:Literal>
+                        </ogc:PropertyIsEqualTo>
+                    </ogc:Filter>
+                    <LineSymbolizer>
+                        <Stroke>
+                            <CssParameter name="stroke">#FF8C00</CssParameter>
+                            <CssParameter name="stroke-width">3</CssParameter>
+                        </Stroke>
+                    </LineSymbolizer>
+                </Rule>
+                <Rule>
+                    <Title>Sem classificação</Title>
+                    <ogc:Filter>
+                        <ogc:PropertyIsEqualTo>
+                            <ogc:PropertyName>tipo_via</ogc:PropertyName>
+                            <ogc:Literal>unclassified</ogc:Literal>
+                        </ogc:PropertyIsEqualTo>
+                    </ogc:Filter>
+                    <LineSymbolizer>
+                        <Stroke>
+                            <CssParameter name="stroke">#A9A9A9</CssParameter>
+                            <CssParameter name="stroke-width">1</CssParameter>
+                        </Stroke>
+                    </LineSymbolizer>
+                </Rule>
+                <Rule>
+                    <Title>Conexões principais</Title>
+                    <ogc:Filter>
+                        <ogc:PropertyIsEqualTo>
+                            <ogc:PropertyName>tipo_via</ogc:PropertyName>
+                            <ogc:Literal>primary_link</ogc:Literal>
+                        </ogc:PropertyIsEqualTo>
+                    </ogc:Filter>
+                    <LineSymbolizer>
+                        <Stroke>
+                            <CssParameter name="stroke">#FF6347</CssParameter>
+                            <CssParameter name="stroke-width">2.5</CssParameter>
+                        </Stroke>
+                    </LineSymbolizer>
+                </Rule>
+                <Rule>
+                    <Title>Trunk</Title>
+                    <ogc:Filter>
+                        <ogc:PropertyIsEqualTo>
+                            <ogc:PropertyName>tipo_via</ogc:PropertyName>
+                            <ogc:Literal>trunk</ogc:Literal>
+                        </ogc:PropertyIsEqualTo>
+                    </ogc:Filter>
+                    <LineSymbolizer>
+                        <Stroke>
+                            <CssParameter name="stroke">#FF4500</CssParameter>
+                            <CssParameter name="stroke-width">4</CssParameter>
+                        </Stroke>
+                    </LineSymbolizer>
+                </Rule>
+                <Rule>
+                    <Title>Estrada local</Title>
+                    <ogc:Filter>
+                        <ogc:PropertyIsEqualTo>
+                            <ogc:PropertyName>tipo_via</ogc:PropertyName>
+                            <ogc:Literal>living_street</ogc:Literal>
+                        </ogc:PropertyIsEqualTo>
+                    </ogc:Filter>
+                    <LineSymbolizer>
+                        <Stroke>
+                            <CssParameter name="stroke">#98FB98</CssParameter>
+                            <CssParameter name="stroke-width">1</CssParameter>
+                        </Stroke>
+                    </LineSymbolizer>
+                </Rule>
+                <Rule>
+                    <Title>Conexão secundária</Title>
+                    <ogc:Filter>
+                        <ogc:PropertyIsEqualTo>
+                            <ogc:PropertyName>tipo_via</ogc:PropertyName>
+                            <ogc:Literal>secondary_link</ogc:Literal>
+                        </ogc:PropertyIsEqualTo>
+                    </ogc:Filter>
+                    <LineSymbolizer>
+                        <Stroke>
+                            <CssParameter name="stroke">#FFD700</CssParameter>
+                            <CssParameter name="stroke-width">2</CssParameter>
+                        </Stroke>
+                    </LineSymbolizer>
+                </Rule>
+                <Rule>
+                    <Title>Trunk link</Title>
+                    <ogc:Filter>
+                        <ogc:PropertyIsEqualTo>
+                            <ogc:PropertyName>tipo_via</ogc:PropertyName>
+                            <ogc:Literal>trunk_link</ogc:Literal>
+                        </ogc:PropertyIsEqualTo>
+                    </ogc:Filter>
+                    <LineSymbolizer>
+                        <Stroke>
+                            <CssParameter name="stroke">#FFA500</CssParameter>
+                            <CssParameter name="stroke-width">2.5</CssParameter>
+                        </Stroke>
+                    </LineSymbolizer>
+                </Rule>
+                <Rule>
+                    <Title>Conexão Rodovia</Title>
+                    <ogc:Filter>
+                        <ogc:PropertyIsEqualTo>
+                            <ogc:PropertyName>tipo_via</ogc:PropertyName>
+                            <ogc:Literal>motorway_link</ogc:Literal>
+                        </ogc:PropertyIsEqualTo>
+                    </ogc:Filter>
+                    <LineSymbolizer>
+                        <Stroke>
+                            <CssParameter name="stroke">#87CEEB</CssParameter>
+                            <CssParameter name="stroke-width">2.5</CssParameter>
+                        </Stroke>
+                    </LineSymbolizer>
+                </Rule>
+                <Rule>
+                    <Title>Rodovia</Title>
+                    <ogc:Filter>
+                        <ogc:PropertyIsEqualTo>
+                            <ogc:PropertyName>tipo_via</ogc:PropertyName>
+                            <ogc:Literal>motorway</ogc:Literal>
+                        </ogc:PropertyIsEqualTo>
+                    </ogc:Filter>
+                    <LineSymbolizer>
+                        <Stroke>
+                            <CssParameter name="stroke">#0000FF</CssParameter>
+                            <CssParameter name="stroke-width">5</CssParameter>
+                        </Stroke>
+                    </LineSymbolizer>
+                </Rule>
+                <Rule>
+                    <Title>Conexão Terciária</Title>
+                    <ogc:Filter>
+                        <ogc:PropertyIsEqualTo>
+                            <ogc:PropertyName>tipo_via</ogc:PropertyName>
+                            <ogc:Literal>tertiary_link</ogc:Literal>
+                        </ogc:PropertyIsEqualTo>
+                    </ogc:Filter>
+                    <LineSymbolizer>
+                        <Stroke>
+                            <CssParameter name="stroke">#FFDAB9</CssParameter>
+                            <CssParameter name="stroke-width">1.5</CssParameter>
+                        </Stroke>
+                    </LineSymbolizer>
+                </Rule>
+            </FeatureTypeStyle>
+        </UserStyle>
+    </NamedLayer>
+</StyledLayerDescriptor>
