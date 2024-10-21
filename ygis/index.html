@@ -4,10 +4,88 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/x-icon" href="https://openlayers.org/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Using OpenLayers with Vite</title>
+    <title>Projeto yGIS</title>
+    <style>
+      body, html {
+          margin: 0;
+          padding: 0;
+          height: 100%;
+          font-family: Arial, sans-serif;
+          display: flex;
+          flex-direction: column;
+      }
+
+      /* Barra superior com logo e nome do cliente */
+      #top-bar {
+          background-color: #333;
+          color: white;
+          height: 40px;
+          line-height: 60px; /* Alinhamento vertical do texto */
+          display: flex;
+          /*justify-content: space-between;*/
+          padding: 10px 10px;
+          position: fixed;
+          top: 0;
+          width: 100%;
+          z-index: 10; /* Garante que fique acima do mapa */
+      }
+
+      #top-bar img {
+          height: 40px;
+          padding: 0px 10px 0px 0px;
+      }
+
+      #top-bar-name {
+        color: #ffffff;
+        text-align: left;
+        letter-spacing: 1px;
+
+      }
+
+      /* Container principal abaixo da barra */
+      #main-container {
+          display: flex;
+          flex-grow: 1;
+          margin-top: 60px; /* Espaço para a barra superior */
+      }
+
+      /* Barra lateral com informações */
+      #sidebar {
+          width: 20%;
+          background-color: #f4f4f4;
+          padding: 10px;
+          border-right: 1px solid #ddd;
+          overflow-y: auto;
+          z-index: 10;
+      }
+
+      /* Área do mapa */
+      #map {
+          flex-grow: 1;
+          height: 100%;
+          width: 80%;
+      }
+  </style>
   </head>
   <body>
-    <div id="map"></div>
+    <!-- Barra superior com logo e nome do cliente -->
+    <div id="top-bar">
+      <img src="https://placehold.co/100x50/666666/FFF000/png" alt="Projeto yGIS">
+      <div id="top-bar-name">Projeto yGIS</div>
+    </div>
+
+    <div id="main-container">
+      <!-- Barra lateral para informações sobre as geometrias clicadas -->
+      <div id="sidebar">
+          <h2>Informações</h2>
+          <p>Clique em um elemento no mapa para ver mais detalhes aqui.</p>
+          <!-- Informações complementares serão inseridas dinamicamente -->
+          <div id="info"></div>
+      </div>
+
+      <!-- Área do mapa -->
+      <div id="map"></div>
+  </div>
     <script type="module" src="./main.js"></script>
   </body>
 </html>
