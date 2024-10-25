@@ -26,7 +26,7 @@
           padding: 10px 10px;
           position: fixed;
           top: 0;
-          width: 100%;
+          width: 20%;
           z-index: 10; /* Garante que fique acima do mapa */
       }
 
@@ -65,6 +65,15 @@
           height: 100%;
           width: 80%;
       }
+
+      .fade-out {
+          opacity: 1;
+          transition: opacity 2s ease-in-out;
+      }
+
+      .fade-out.hidden {
+        opacity: 0;
+      }
   </style>
   </head>
   <body>
@@ -80,7 +89,9 @@
           <h2>Informações</h2>
           <p>Clique em um elemento no mapa para ver mais detalhes aqui.</p>
           <!-- Informações complementares serão inseridas dinamicamente -->
-          <div id="info"></div>
+          <div id="info"></div> <!-- Atributos da geometria clicada -->
+          <div id="mouse-coordinates"></div> <!-- Coordenadas do mouse em tempo real -->
+          <div id="copy-coordinates"></div> <!-- Informa que coordenadas foram salvas na área de transferência-->
       </div>
 
       <!-- Área do mapa -->
