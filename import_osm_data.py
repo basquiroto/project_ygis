@@ -3,7 +3,7 @@ import osmnx as ox
 import pandas as pd
 import geopandas as gpd
 from sqlalchemy import create_engine
-# %% 
+# %% IMPORTANDO LOGRADOUROS...
 city_name = 'Criciúma, Santa Catarina, Brazil'
 graph = ox.graph_from_place(city_name, network_type='drive')
 nodes, edges = ox.graph_to_gdfs(graph) # nós, arestas
@@ -74,3 +74,17 @@ conexao = f'postgresql+psycopg2://{usuario}:{senha}@{host}:{porta}/'
 engine = create_engine(conexao)
 
 ruas.to_postgis(name="ruas", con=engine, schema='ygis', if_exists="replace", index=False)
+
+# %% Importando Escolas
+school_gdf = ox.features.features_from_place(query=city_name, tags={'amenity': 'school'})
+
+# %%
+output_path = 'C:\\Users\\ferna\\Downloads\\'
+school_json = school_gdf.to_json()
+
+with open(output_path+"schools.geojson", 'w', encoding='utf-8') as file:
+    file.write(school_json)
+
+# %%
+# Precisa limpar os dados e converter os polígonos para pontos.
+# school_gdf[school_gdf.geom_type=='Polygon']
