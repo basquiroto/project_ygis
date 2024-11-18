@@ -2,22 +2,39 @@ import './style.css';
 import {Map, View} from 'ol';
 //import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
+import VectorTileLayer from 'ol/layer/VectorTile.js';
+import VectorTileSource from 'ol/source/VectorTile.js';
+import MVT from 'ol/format/MVT.js';
 import ImageWMS from 'ol/source/ImageWMS.js';
 import {Image as ImageLayer, Tile as TileLayer} from 'ol/layer.js';
 import {fromLonLat, toLonLat, transform} from 'ol/proj.js';
 import {toStringHDMS} from 'ol/coordinate.js';
+import {Fill, Stroke, Style} from 'ol/style.js';
 
 const layers = [
   new TileLayer({source: new OSM()}),
-  new ImageLayer({
-    extent: [-5508658, -3356506, -5485284, -3324648],
-    source: new ImageWMS({
-      url: 'http://localhost:8080/geoserver/projeto_ygis/wms',
-      params: {'LAYERS': 'projeto_ygis:ruas'},
-      ratio: 1,
-      serverType: 'geoserver'
+  // new ImageLayer({
+  //   extent: [-5508658, -3356506, -5485284, -3324648],
+  //   source: new ImageWMS({
+  //     url: 'http://localhost:8080/geoserver/projeto_ygis/wms',
+  //     params: {'LAYERS': 'projeto_ygis:ruas'},
+  //     ratio: 1,
+  //     serverType: 'geoserver'
+  //   }),
+  // }),
+  new VectorTileLayer({
+    declutter: false,
+    source: new VectorTileSource({
+      format: new MVT(),
+      url: 'http://localhost:8080/{z}/{x}/{y}.pbf'
     }),
-  }),
+    style: new Style({
+        stroke: new Stroke({
+          color: 'red',
+          width: 1
+        })
+    })
+  })
 ];
 
 const map = new Map({
