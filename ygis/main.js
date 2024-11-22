@@ -84,30 +84,48 @@ function getCoordinates(event) {
 
 // Evento de clique no mapa para obter atributos
 map.on('singleclick', function (evt) {
-  const viewResolution = map.getView().getResolution();
+  // const viewResolution = map.getView().getResolution();
 
-  const url = `${wmsUrl}?${new URLSearchParams({
-      ...featureRequestParams,
-      BBOX: map.getView().calculateExtent(map.getSize()).toString(),
-      WIDTH: map.getSize()[0],
-      HEIGHT: map.getSize()[1],
-      X: Math.floor(evt.pixel[0]),
-      Y: Math.floor(evt.pixel[1]),
-      SRS: 'EPSG:3857'
-  }).toString()}`;
+  // const url = `${wmsUrl}?${new URLSearchParams({
+  //     ...featureRequestParams,
+  //     BBOX: map.getView().calculateExtent(map.getSize()).toString(),
+  //     WIDTH: map.getSize()[0],
+  //     HEIGHT: map.getSize()[1],
+  //     X: Math.floor(evt.pixel[0]),
+  //     Y: Math.floor(evt.pixel[1]),
+  //     SRS: 'EPSG:3857'
+  // }).toString()}`;
 
-  fetch(url)
-      .then((response) => response.json())
-      .then((data) => {
-          if (data.features.length > 0) {
-              const attributes = data.features[0].properties;
-              const tableHTML = createAttributesTable(attributes);
-              document.getElementById('info').innerHTML = tableHTML;
-          } else {
-              document.getElementById('info').innerHTML = '<p>Nenhuma geometria encontrada.</p>';
-          }
-      })
-      .catch((error) => console.log('Erro ao obter atributos:', error));
+  // fetch(url)
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //         if (data.features.length > 0) {
+  //             const attributes = data.features[0].properties;
+  //             const tableHTML = createAttributesTable(attributes);
+  //             document.getElementById('info').innerHTML = tableHTML;
+  //         } else {
+  //             document.getElementById('info').innerHTML = '<p>Nenhuma geometria encontrada.</p>';
+  //         }
+  //     })
+  //     .catch((error) => console.log('Erro ao obter atributos:', error));
+
+    const coordinate = evt.coordinate;
+    const [lon, lat] = toLonLat(coordinate);
+
+    const url = `http://localhost:8081/data/ruas?lat=${lat}&lon=${lon}`;
+
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+                if (data.length > 0) {
+                    const attributes = data[0];
+                    const tableHTML = createAttributesTable(attributes);
+                    document.getElementById('info').innerHTML = tableHTML;
+                } else {
+                    document.getElementById('info').innerHTML = '<b style=\'color:red;\'><p>Nenhuma geometria encontrada.</p></b>';
+                }
+            })
+      .catch(error => console.error('Ah, erro!', error));
 
   // Caso o usuário clique segurando a tecla Ctrl.
   const originalEvent = evt.originalEvent;
