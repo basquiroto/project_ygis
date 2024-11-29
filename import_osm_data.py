@@ -3,8 +3,18 @@ import osmnx as ox
 import pandas as pd
 import geopandas as gpd
 from sqlalchemy import create_engine
-# %% IMPORTANDO LOGRADOUROS...
+# %% Dados base
 city_name = 'Criciúma, Santa Catarina, Brazil'
+
+usuario = 'postgres'
+senha = 'postgres'
+host = 'localhost'
+porta = 5434
+database = 'postgres'
+conexao = f'postgresql+psycopg2://{usuario}:{senha}@{host}:{porta}/'
+engine = create_engine(conexao)
+
+# %% IMPORTANDO LOGRADOUROS...
 graph = ox.graph_from_place(city_name, network_type='drive')
 nodes, edges = ox.graph_to_gdfs(graph) # nós, arestas
 
@@ -65,14 +75,6 @@ ruas.rename(columns={'lanes': 'nr_faixas', 'highway': 'tipo_via',
                      'name': 'nome'}, inplace=True)
 
 # %%
-usuario = 'postgres'
-senha = 'postgres'
-host = 'localhost'
-porta = 5434
-database = 'postgres'
-conexao = f'postgresql+psycopg2://{usuario}:{senha}@{host}:{porta}/'
-engine = create_engine(conexao)
-
 ruas.to_postgis(name="ruas", con=engine, schema='ygis', if_exists="replace", index=False)
 
 # %% Importando Escolas
@@ -86,5 +88,38 @@ with open(output_path+"schools.geojson", 'w', encoding='utf-8') as file:
     file.write(school_json)
 
 # %%
-# Precisa limpar os dados e converter os polígonos para pontos.
-# school_gdf[school_gdf.geom_type=='Polygon']
+school_gdf['geometry'] = school_gdf['geometry'].apply(
+    lambda geom: geom.representative_point() if geom.geom_type == 'Polygon' else geom
+)
+
+if isinstance(school_gdf.index, pd.MultiIndex):
+    school_gdf = school_gdf.reset_index()
+
+# %%
+# DB FROM > TO
+# 'osmid' > osmid
+# 'amenity' > WILL NOT BE IMPORTED
+# 'name' > nome
+# 'geometry' > geometry
+# 'wheelchair' > WILL NOT BE IMPORTED
+# 'access' > WILL NOT BE IMPORTED
+# 'addr:housenumber' > WILL NOT BE IMPORTED
+# 'addr:street' > WILL NOT BE IMPORTED
+# 'operator' > WILL NOT BE IMPORTED
+# 'short_name' > WILL NOT BE IMPORTED
+# 'addr:postcode' > WILL NOT BE IMPORTED
+# 'alt_name' > WILL NOT BE IMPORTED
+# 'contact:phone' > WILL NOT BE IMPORTED
+# 'nodes' > WILL NOT BE IMPORTED
+# 'addr:city' > WILL NOT BE IMPORTED
+# 'official_name' > WILL NOT BE IMPORTED
+# 'phone' > WILL NOT BE IMPORTED
+# 'addr:suburb' > WILL NOT BE IMPORTED
+# 'website' > WILL NOT BE IMPORTED
+# 'ways' > WILL NOT BE IMPORTED
+# 'type > WILL NOT BE IMPORTED'
+escolas = school_gdf[['osmid', 'name', 'geometry']]
+
+escolas.rename(columns={'name': 'nome'}, inplace=True)
+#%%
+escolas.to_postgis(name="escolas", con=engine, schema='ygis', if_exists="replace", index=False)

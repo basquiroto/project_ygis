@@ -16,12 +16,12 @@ DATABASE = {
     }
 
 ## Table for the MVT Tiles 
-TABLE = {
-    'table':       'ruas',
-    'srid':        '4326',
-    'geomColumn':  'geometry',
-    'attrColumns': 'osmid, nr_faixas, tipo_via, nome'
-    }
+# TABLE = {
+#     'table':       'ruas',
+#     'srid':        '4326',
+#     'geomColumn':  'geometry',
+#     'attrColumns': 'osmid, nr_faixas, tipo_via, nome'
+#     }
 
 PORT = 8081
 
@@ -31,7 +31,7 @@ class DatabaseRequestHandler(http.server.BaseHTTPRequestHandler):
     # Functions pathToTile, tileToEnvelope, tileToEnvelope, envelopeToBoundsSQL, envelopeToSQL, sqlToPbf
     # from https://github.com/pramsey/minimal-mvt
     def pathToTile(self, path):
-        m = re.search(r'^\/vector-tiles\/(\d+)\/(\d+)\/(\d+)\.(\w+)', path)
+        m = re.search(r'^\/(\d+)\/(\d+)\/(\d+)\.(\w+)', path)
         if (m):
             return {'zoom':   int(m.group(1)), 
                     'x':      int(m.group(2)), 
@@ -86,8 +86,8 @@ class DatabaseRequestHandler(http.server.BaseHTTPRequestHandler):
     # Generate a SQL query to pull a tile worth of MVT data
     # from the table of interest.
     # WITH bounds AS (SELECT ST_Segmentize(ST_MakeEnvelope(-5497351.074269865, -3334488.921912521, -5496739.578043582, -3333877.42568624, 3857),152.87405657069758) AS geom, ST_Segmentize(ST_MakeEnvelope(-5497351.074269865, -3334488.921912521, -5496739.578043582, -3333877.42568624, 3857),152.87405657069758)::box2d AS b2d), mvtgeom AS (SELECT ST_AsMVTGeom(ST_Transform(t.geometry, 3857), bounds.b2d) AS geom, osmid, nr_faixas, tipo_via, nome FROM ruas t, bounds WHERE ST_Intersects(t.geometry, ST_Transform(bounds.geom, 4326))) SELECT ST_AsMVT(mvtgeom.*) FROM mvtgeom        
-    def envelopeToSQL(self, env):
-        tbl = TABLE.copy()
+    def envelopeToSQL(self, env, table):
+        tbl = table.copy()
         tbl['env'] = self.envelopeToBoundsSQL(env)
         # Materialize the bounds
         # Select the relevant geometry and clip to MVT bounds
@@ -119,17 +119,18 @@ class DatabaseRequestHandler(http.server.BaseHTTPRequestHandler):
         parsed_url = urlparse(self.path)
 
         if parsed_url.path.startswith('/vector-tiles'):
-            #path = self.path[len('/vector-tiles'):]
             path = self.path
-            tile = self.pathToTile(path)
 
-            if not (tile and self.tileIsValid(tile)):
-                self.send_error(400, "Invalid tile path: %s" % (self.path))
-                return
+            if parsed_url.path.startswith('/vector-tiles/ruas'):
+                path = self.path[len('/vector-tiles/ruas'):]
+                TABLE = {'table': 'ruas', 'srid': '4326', 'geomColumn':  'geometry', 'attrColumns': 'osmid, nr_faixas, tipo_via, nome'}
+                pbf = self.handle_tiles_request(path, TABLE)
 
-            env = self.tileToEnvelope(tile)
-            sql = self.envelopeToSQL(env)
-            pbf = self.sqlToPbf(sql)
+            elif parsed_url.path.startswith('/vector-tiles/escolas'):
+                path = self.path[len('/vector-tiles/escolas'):]
+                TABLE = {'table': 'escolas', 'srid': '4326', 'geomColumn':  'geometry', 'attrColumns': 'osmid, nome'}
+                pbf = self.handle_tiles_request(path, TABLE)
+
             self.send_response(200)
             self.send_header("Access-Control-Allow-Origin", "*")
             self.send_header("Content-type", "application/vnd.mapbox-vector-tile")
@@ -144,7 +145,20 @@ class DatabaseRequestHandler(http.server.BaseHTTPRequestHandler):
         
         else:
             self.send_error(404, "Ops! Invalid endpoint: %s" % (self.path))
-        
+    
+    def handle_tiles_request(self, path, table):
+        tile = self.pathToTile(path)
+
+        if not (tile and self.tileIsValid(tile)):
+            self.send_error(400, "Invalid tile path: %s" % (self.path))
+            return
+
+        env = self.tileToEnvelope(tile)
+        sql = self.envelopeToSQL(env, table)
+        pbf = self.sqlToPbf(sql)
+
+        return pbf
+
     def handle_ruas_request(self, lat, lon):
         try:
             if lat and lon:
@@ -187,7 +201,7 @@ class DatabaseRequestHandler(http.server.BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
 
-    def fetch_ruas_data(self, lat, lon, radius=0.00001):
+    def fetch_ruas_data(self, lat, lon, radius=0.00005):
         try:
             conn = psycopg2.connect(**DATABASE)
             cursor = conn.cursor()

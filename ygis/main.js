@@ -9,7 +9,7 @@ import ImageWMS from 'ol/source/ImageWMS.js';
 import {Image as ImageLayer, Tile as TileLayer} from 'ol/layer.js';
 import {fromLonLat, toLonLat, transform} from 'ol/proj.js';
 import {toStringHDMS} from 'ol/coordinate.js';
-import {Fill, Stroke, Style} from 'ol/style.js';
+import {Circle, Fill, Stroke, Style} from 'ol/style.js';
 
 const layers = [
   new TileLayer({source: new OSM()}),
@@ -26,12 +26,26 @@ const layers = [
     declutter: false,
     source: new VectorTileSource({
       format: new MVT(),
-      url: 'http://localhost:8081/vector-tiles/{z}/{x}/{y}.pbf'
+      url: 'http://localhost:8081/vector-tiles/ruas/{z}/{x}/{y}.pbf'
     }),
     style: new Style({
         stroke: new Stroke({
           color: 'red',
           width: 1
+        })
+    })
+  }),
+  new VectorTileLayer({
+    declutter: false,
+    source: new VectorTileSource({
+      format: new MVT(),
+      url: 'http://localhost:8081/vector-tiles/escolas/{z}/{x}/{y}.pbf'
+    }),
+    style: new Style({
+        image: new Circle({
+          fill: new Fill({'color': 'rgba(0, 123, 255, 0.8)'}),
+          radius: 6,
+          stroke: new Stroke({'color': '#0056b3', 'width': 2})
         })
     })
   })
