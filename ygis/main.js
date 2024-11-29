@@ -26,7 +26,7 @@ const layers = [
     declutter: false,
     source: new VectorTileSource({
       format: new MVT(),
-      url: 'http://localhost:8080/{z}/{x}/{y}.pbf'
+      url: 'http://localhost:8081/vector-tiles/{z}/{x}/{y}.pbf'
     }),
     style: new Style({
         stroke: new Stroke({
