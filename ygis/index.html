@@ -59,6 +59,20 @@
           z-index: 10;
       }
 
+      /* #sidebar button{
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+      #siderbar button:hover {
+            background-color: #666666;
+        } */
+
       /* Área do mapa */
       #map {
           flex-grow: 1;
@@ -74,6 +88,49 @@
       .fade-out.hidden {
         opacity: 0;
       }
+
+      /* Style for the popup of the route button */
+      .popup {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            border-radius: 8px;
+            width: 300px;
+            text-align: center;
+        }
+
+        /* Overlay to dim the background */
+        .overlay {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        /* Style for buttons */
+       button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+       button:hover {
+            background-color: #666666;
+        }
   </style>
   </head>
   <body>
@@ -92,6 +149,26 @@
           <div id="info"></div> <!-- Atributos da geometria clicada -->
           <div id="mouse-coordinates"></div> <!-- Coordenadas do mouse em tempo real -->
           <div id="copy-coordinates"></div> <!-- Informa que coordenadas foram salvas na área de transferência-->
+
+          <h2>Rotas</h2>
+          <p>Cálculo de Rota: <button id="routeButton">Iniciar</button></p>
+
+          <p><button id="resetPreference">Reset Popup Preference</button></p>
+
+          <!-- Popup -->
+          <div class="overlay" id="overlay"></div>
+          <div class="popup" id="popup">
+          <h3>How Routing Works</h3>
+          <p>
+          Click on the map to select two points. The system will calculate the shortest route between them using pgRouting.
+          </p>
+          <div class="checkbox-container">
+            <label>
+                <input type="checkbox" id="dontShowAgain"> Don't show this message again
+            </label>
+        </div>
+          <button id="okButton">OK</button>
+    </div>
       </div>
 
       <!-- Área do mapa -->
