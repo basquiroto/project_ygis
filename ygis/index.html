@@ -101,7 +101,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             z-index: 1000;
             border-radius: 8px;
-            width: 300px;
+            width: 440px;
             text-align: center;
         }
 
@@ -153,18 +153,18 @@
           <h2>Rotas</h2>
           <p>Cálculo de Rota: <button id="routeButton">Iniciar</button></p>
 
-          <p><button id="resetPreference">Reset Popup Preference</button></p>
+          <p><button id="resetPreference">Resetar Preferência Popup</button></p>
 
           <!-- Popup -->
           <div class="overlay" id="overlay"></div>
           <div class="popup" id="popup">
-          <h3>How Routing Works</h3>
+          <h3>Como o cálculo de rota funciona?</h3>
           <p>
-          Click on the map to select two points. The system will calculate the shortest route between them using pgRouting.
+          Clique no mapa e selecione dois pontos. O sistema irá usar calcular a rota mais curta usando pgRouting (pgr_dijkstra).
           </p>
           <div class="checkbox-container">
             <label>
-                <input type="checkbox" id="dontShowAgain"> Don't show this message again
+                <input type="checkbox" id="dontShowAgain"> Não mostrar essa mensagem de novo.
             </label>
         </div>
           <button id="okButton">OK</button>

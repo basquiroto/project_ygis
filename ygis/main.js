@@ -5,8 +5,12 @@ import {Map, View} from 'ol';
 //import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
 import VectorTileLayer from 'ol/layer/VectorTile.js';
+import VectorLayer from 'ol/layer/Vector.js';
 import VectorTileSource from 'ol/source/VectorTile.js';
 import MVT from 'ol/format/MVT.js';
+import WKT from 'ol/format/WKT.js';
+import GeoJSON from 'ol/format/GeoJSON.js';
+import VectorSource from 'ol/source/Vector.js';
 import ImageWMS from 'ol/source/ImageWMS.js';
 import {Image as ImageLayer, Tile as TileLayer} from 'ol/layer.js';
 import {fromLonLat, toLonLat, transform} from 'ol/proj.js';
@@ -160,6 +164,44 @@ function getCoordinates(event) {
   return textCoord;
 }
 
+function sendCoordinatesToBackend(point1, point2) {
+  fetch('http://localhost:8081/calculate-route', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+          point1: point1,
+          point2: point2,
+      }),
+  })
+  .then(response => response.json())
+  .then(data => {
+      displayRouteOnMap(data.route); // Display the returned route on the map
+  })
+  .catch(error => console.error('Error 178:', error));
+}
+
+function displayRouteOnMap(routeGeoJSON) { // TODO: Button and process to remove route from map.
+  const format = new WKT();
+  const feature = format.readFeature(routeGeoJSON, {
+    dataProjection: 'EPSG:4326',
+    featureProjection: 'EPSG:3857',
+  })
+  const routeLayer = new VectorLayer({
+      source: new VectorSource({
+          features: [feature],
+      }),
+      style: new Style({
+        stroke: new Stroke({
+          color: 'blue',
+          width: 2
+        })
+    })
+  });
+  map.addLayer(routeLayer);
+}
+
 // Evento de clique no mapa para obter atributos
 map.on('singleclick', function (evt) {
   // const viewResolution = map.getView().getResolution();
@@ -209,14 +251,14 @@ map.on('singleclick', function (evt) {
   if (routeMode) {
     const coordinate = evt.coordinate;
     if (!point1) {
-        point1 = coordinate;
-        alert('First point selected. Click again to select the second point.');
+        point1 = toLonLat(coordinate);
+        alert('Primeiro ponto selecionado. Clique novamente para o segundo ponto.');
     } else if (!point2) {
-        point2 = coordinate;
+        point2 = toLonLat(coordinate);
         routeMode = false; // Disable route selection mode
-        alert('Second point selected. Calculating route...');
+        alert('Segundo ponto selecionado. Calculando rota...');
         mapContainer.style.cursor = 'default';
-        //sendCoordinatesToBackend(point1, point2); // Send coordinates to backend
+        sendCoordinatesToBackend(point1, point2); // Send coordinates to backend
     }
   }
 

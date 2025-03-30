@@ -197,7 +197,7 @@ class DatabaseRequestHandler(http.server.BaseHTTPRequestHandler):
         # Handle preflight requests
         self.send_response(200)
         self.send_header("Access-Control-Allow-Origin", "http://localhost:5173")
-        self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
 
@@ -231,6 +231,89 @@ class DatabaseRequestHandler(http.server.BaseHTTPRequestHandler):
 
     def log_message(self, format, *args):
         print(f'{self.client_address[0]} - {format % args}')
+
+    def process_result_to_geojson(self, result):
+        """
+        Convert the pgRouting result into GeoJSON format.
+        Customize this based on your data structure.
+        """
+        features = "GEOMETRYCOLLECTION("
+        for index, row in enumerate(result):
+            features += row[0]
+            if index != len(result)-1:
+                features += ', '
+        features += ')'
+        return features
+
+    def query_pgrouting(self, point1, point2):
+        """
+        Query the pgRouting database to calculate the shortest path between two points.
+        Returns the route geometry as GeoJSON.
+        """
+        try:
+            conn = psycopg2.connect(**DATABASE)
+            cursor = conn.cursor()
+
+            # Convert coordinates to nearest network nodes
+            query = """
+            SELECT ST_AsText(geometry) FROM pgr_dijkstra(
+                'SELECT id, inicio AS source, fim AS target, comprimento AS cost FROM ygis.ruas',
+                (SELECT id FROM ruas_vertices_pgr ORDER BY the_geom <-> ST_SetSRID(ST_MakePoint(%s, %s), 4326) LIMIT 1),
+                (SELECT id FROM ruas_vertices_pgr ORDER BY the_geom <-> ST_SetSRID(ST_MakePoint(%s, %s), 4326) LIMIT 1),
+                FALSE
+            ) d
+            INNER JOIN ruas r ON r.id = d.edge;
+            """
+            cursor.execute(query, (point1[0], point1[1], point2[0], point2[1]))
+            result = cursor.fetchall()
+
+            # Process the result into GeoJSON format
+            geojson = self.process_result_to_geojson(result)
+
+            cursor.close()
+            conn.close()
+
+            return geojson
+
+        except Exception as e:
+            raise Exception(f"Database query failed: {str(e)}")
+
+    def do_POST(self):
+        # Check if the request is for the /calculate-route endpoint
+        if self.path == '/calculate-route':
+            try:
+                # Parse the JSON payload from the request body
+                content_length = int(self.headers['Content-Length'])
+                post_data = self.rfile.read(content_length)
+                data = json.loads(post_data)
+
+                # Extract coordinates from the request
+                point1 = data.get('point1')
+                point2 = data.get('point2')
+
+                if not point1 or not point2:
+                    self.send_error(400, "Missing coordinates in request")
+                    return
+
+                # Query pgRouting to calculate the route
+                route_geojson = self.query_pgrouting(point1, point2)
+
+                # Send a successful response with the route GeoJSON
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')  # Allow all origins
+                self.send_header('Access-Control-Allow-Methods', 'POST, OPTIONS')  # Allow POST and OPTIONS
+                self.send_header('Access-Control-Allow-Headers', 'Content-Type')  # Allow Content-Type header
+                self.end_headers()
+                self.wfile.write(json.dumps({'route': route_geojson}).encode('utf-8'))
+
+            except Exception as e:
+                # Handle any errors during processing
+                self.send_error(500, f"Server error: {str(e)}")
+
+        else:
+            # Handle unknown routes
+            self.send_error(404, "Route not found")
 
 with socketserver.TCPServer(("", PORT), DatabaseRequestHandler) as httpd:
     print(f'Serving on port {PORT}')
